@@ -1,17 +1,14 @@
 import  Router  from "next/router";
 
-const Users = (props) => {
-    console.log(props)
+const Users = ({tareas}) => {
     return(
         <ul className="list-group">
-            {props.users.map(user=>(
-        <li className="list-group-item d-flex justify-content-between align-items-center" key={user.id} onClick={e =>Router.push('/users/[id]',`/users/${user.id}`)}>
+            {tareas.map(tarea=>(
+        <li className="list-group-item d-flex justify-content-between align-items-center" >
             <div>
-            <h5>{user.first_name} {user.last_name}</h5>
-            <p>{user.email}</p>
+            <h5>{tarea.nombre} {tarea.prioridad}</h5>
+            <button key={tarea._id} onClick={e =>Router.push('/task/[id]',`/task/${tarea._id}`)}> administrar</button>
             </div>
-            <img src={user.avatar} style={{borderRadius:'50%'}}></img>
-            
         </li>
         ))}
         </ul>
