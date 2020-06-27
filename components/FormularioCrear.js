@@ -1,123 +1,99 @@
-import React,{Fragment, useState} from 'react';
-import Error from '../components/Error';
 
+import React,{useState} from 'react'
 
-const FormularioCrear = ({tareas,statePrincipal,guardarStatePrincipal}) =>{
-    
-    console.log(statePrincipal);
-    //State de nueva tarea
-    const[nuevaTarea, guardarNuevaTarea]= useState({
+const FormularioCrear = ({crearTarea})=>{
+    // State para tarea
+    const[tarea,guardarTarea]=useState({
+        _id:'',
         nombre:'',
         prioridad:''
     });
-    const [error, guardarError] = useState(false);
-    const[activar, guardarActivar] = useState(false)
+    // State del error
+    const[error,guardarError]=useState(false);
 
-    const {nombre,prioridad} = nuevaTarea;
+    const{nombre,prioridad}=tarea
 
-    // Funcion que tome las tareas actuales y agregue la nueva 
-
-    // Funcion para cuando el usuario escribre en el formulario
-    const handleChange = e=>{
-
-        guardarNuevaTarea({
-            ...nuevaTarea,
+    // Funcion para capturar cambios en el form
+    const handleChange = e =>{
+        
+        guardarTarea({
+            ...tarea,
             [e.target.name]:e.target.value
-        })
-
-    }
-    // Funcion para activar el formulario
-    const activarCrear = () =>{
-        guardarActivar(true);
+        });
     }
 
-    // Funcion cuando el usuario presion submit
+    // Funcion cuando el usuario presione submit
+    const submitTarea = e =>{
 
-    const submitNuevaTarea = async e =>{
         e.preventDefault();
 
-        // Validación 
+        // Validar Formulario 
         if(nombre.trim() === '' || prioridad === ''){
+            console.log('tamos mal');
             guardarError(true);
             return;
         }
+        // Conexion a base de datos 
+        var url = 'http://localhost:3030/api/task';
+        
+        fetch(url, {
+          method: 'POST', // or 'PUT'
+          body: JSON.stringify(tarea), // data can be `string` or {object}!
+          headers:{
+            'Content-Type': 'application/json'
+          }
+        }).then(res => res.json())
+        .catch(error => console.error('Error:', error))
+        // .then(response => console.log('Success:', response))
+        .then(response => crearTarea(response.task))
 
-        // Guardar en base de datos
-        fetch(`http://localhost:3030/api/task`, {
-            method: 'POST', // or 'PUT'
-            body:JSON.stringify(nuevaTarea), // data can be `string` or {object}!
-            headers:{
-              'Content-Type': 'application/json'
-            }
-          }).then(res => res.json())
-          .catch(error => console.error('Error:', error))
-          .then(response => console.log('Success:', response));
+        // crearTarea(tarea);
 
-        // Reiniciar Formulario
-        guardarNuevaTarea({
+        // Recetear Formulario
+        guardarTarea({
             nombre:'',
             prioridad:''
         })
-
-        guardarStatePrincipal({
-            ...statePrincipal,
-            nuevaTarea
-        })
-          console.log('enviado form');
     }
-
-
+    //Funcion para actualizar Tareas
+    
+    
     return (
-            <Fragment>
+        <div>
+            <h3>Añadir tarea</h3>
+            <form onSubmit={submitTarea}>
+                <div className="form-group">
+                    <label htmlFor="exampleInputEmail1">Tarea</label>
+                    <input 
+                        type="text" 
+                        className="form-control"
+                        name="nombre"
+                        placeholder="Ej. Hacer Deploy en AWS"
+                        onChange={handleChange}
+                        value={nombre}
+                        />
+                </div>  
+                <div className="form-group">
+                    <label htmlFor="exampleFormControlSelect1">Prioridad</label>
+                    <select 
+                        className="form-control" 
+                        id="exampleFormControlSelect1"
+                        name="prioridad"
+                        onChange={handleChange}
+                        value={prioridad}
+                        >
+                        <option>--Seleccione--</option>
+                        <option>Urgente</option>
+                        <option>Alta</option>
+                        <option>Normal</option>
+                        <option>Baja</option>
+                    </select>
+                </div>
 
-                { activar ? 
-                     <div className="container">
-                     <form 
-                         onSubmit={submitNuevaTarea}
-                     
-                     >
-                         {error ? <Error /> : null}
-                         <div className="form-group">
-                             <label htmlFor="exampleInputEmail1">Nombre de tarea</label>
-                             <input 
-                             type="text" 
-                             className="form-control" 
-                             id="exampleInputEmail1" 
-                             aria-describedby="emailHelp"
-                             name="nombre"
-                             onChange={handleChange}
-                             value={nombre}
-                             />
-                         </div>
-
-                         <div className="form-group">
-                             
-                             <label for="exampleFormControlSelect1">Example select</label>
-                             <select 
-                             name="prioridad"
-                             onChange={handleChange}
-                             value={prioridad}
-                             className="form-control" id="exampleFormControlSelect1"
-                             >
-                                 <option> --Selecciones-- </option>
-                                 <option>Urgente</option>
-                                 <option>Alta</option>
-                                 <option>Normal</option>
-                                 <option>Baja</option>
-                          </select>
-                         
-                         </div>
-                     <button type="submit" className="btn btn-primary">Añadir Tarea</button>
-                     </form>
-                 </div>
-                : <button
-                          className="btn btn-primary"
-                          onClick={()=>activarCrear()}
-
-                          >Añadir nueva TareA</button>}
-               
-            </Fragment>
-
+   <button type="submit" className="btn btn-primary">Añadir</button>
+      </form>
+        </div>
     )
 }
+
 export default FormularioCrear;

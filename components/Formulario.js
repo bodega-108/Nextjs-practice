@@ -1,7 +1,8 @@
 import React,{useState, Fragment} from 'react';
 import Error from './Error';
+import Router from 'next/router';
 
-const Formulario = ({id})=>{
+const Formulario = ({identificador})=>{
     // state de formulario
     const[tarea,guardarTarea]=useState({
         nombre:'',
@@ -31,7 +32,6 @@ const Formulario = ({id})=>{
 
     // Cuando el usuario presiona guardar Cambios
     const submitCita =async e =>{
-        e.preventDefault();
 
         // Validaciones
         if(nombre.trim() === '' || prioridad ===''){
@@ -39,7 +39,7 @@ const Formulario = ({id})=>{
             return;
         }
         // Guardar en base de datos
-        fetch(`http://localhost:3030/api/task/${id.id}`, {
+        fetch(`http://localhost:3030/api/task/${identificador}`,{
             method: 'PUT', // or 'PUT'
             body:JSON.stringify(tarea), // data can be `string` or {object}!
             headers:{
@@ -59,70 +59,46 @@ const Formulario = ({id})=>{
 
 
     }
-    // Funcion si el usuario presiona eliminar
-    const eliminarTarea= async e =>{
-        
-        // Eliminar de base de datos
-         // Guardar en base de datos
-         fetch(`http://localhost:3030/api/task/${id.id}`, {
-            method: 'DELETE', // or 'PUT'
-            body:JSON.stringify(tarea), // data can be `string` or {object}!
-            headers:{
-              'Content-Type': 'application/json'
-            }
-          }).then(res => res.json())
-          .catch(error => console.error('Error:', error))
-          .then(response => console.log('Success:', response));
-        // Crear Alerta de exito
 
-        // Reiniciar el formulario
-          
-        console.log('enviado form');
-
-
-
-
-    }
     return (
         <Fragment>
-           
-
-            {activar ?     
-                <form 
+            
+            <div>
+                <h3>Editar Tarea</h3>
+                <form
                     onSubmit={submitCita}
                 >
-                    {error ? <Error/> : null}
-                     <input 
-                        type="text"
-                        name="nombre"
-                        placeholder="nombre de la tarea"
+                <div 
+                className="form-group">
+                <label htmlFor="exampleInputEmail1">Nombre</label>
+                <input 
+                    type="text"
+                    name="nombre" 
+                    className="form-control" 
+                    id="exampleInputEmail1" 
+                    aria-describedby="emailHelp"
+                    onChange={handleChange}
+                    value={nombre}
+                    />
+                </div>
+                <div className="form-group">
+                <label htmlFor="exampleFormControlSelect1">Prioridad</label>
+                    <select
+                        name="prioridad" 
+                        className="form-control" 
+                        id="exampleFormControlSelect1"
                         onChange={handleChange}
-                        value={nombre}
-                         />
-
-                         <select 
-                            name="prioridad"
-                            onChange={handleChange}
-                            value={prioridad}
-                            >
-                                <option> --Selecciones-- </option>
-                                <option>Urgente</option>
-                                <option>Alta</option>
-                                <option>Normal</option>
-                                <option>Baja</option>
-                         </select>
-
-                         <button className="btn btn-success" type="submit">Guardar Cambios</button>
-                </form> : null
-                }
-         <button 
-        className="btn btn-primary" 
-        onClick={()=> editarTarea()}
-        >Editar</button>
-        
-        <button 
-            className="btn btn-danger"
-            onClick={()=> eliminarTarea()}>Eliminar</button>
+                        value={prioridad}>
+                        <option>--Seleccione--</option>
+                        <option>Urgente</option>
+                        <option>Alta</option>
+                        <option>Normal</option>
+                        <option>Baja</option>
+                    </select>
+      </div>
+                <button type="submit" con className="btn btn-primary">Editar</button>
+            </form>
+            </div>
         </Fragment>
         
         )
